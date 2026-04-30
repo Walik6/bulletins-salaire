@@ -100,7 +100,7 @@ st.set_page_config(page_title="Bulletins de Salaire", page_icon="📄", layout="
 # ── Titre + bouton déconnexion ─────────────────────────────────────────────
 col_titre, _, col_logout = st.columns([6, 1, 2])
 with col_titre:
-    st.title("📄 Bulletins de Salaire")
+    st.title("Salut Amir!")
 with col_logout:
     st.markdown("<div style='margin-top:18px'>", unsafe_allow_html=True)
     if st.button("🚪 Déconnexion", use_container_width=True):
@@ -108,7 +108,7 @@ with col_logout:
         st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("Uploadez vos fichiers, ajustez les colonnes si besoin, puis cliquez sur **Lancer**.")
+st.markdown("Uploade tes fichiers et le tour est joué.")
 st.divider()
 
 # ── Upload fichiers ────────────────────────────────────────────────────────
