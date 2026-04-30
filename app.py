@@ -5,6 +5,29 @@ from pypdf import PdfReader, PdfWriter
 from rapidfuzz import process, fuzz
 from datetime import datetime
 
+# ── Mot de passe ───────────────────────────────────────────────────────────
+MOT_DE_PASSE = st.secrets["mot_de_passe"]
+
+def verifier_mdp():
+    if "authentifie" not in st.session_state:
+        st.session_state.authentifie = False
+
+    if not st.session_state.authentifie:
+        st.set_page_config(page_title="Connexion", page_icon="🔒", layout="centered")
+        st.title("🔒 Accès sécurisé")
+        st.markdown("Entrez le mot de passe pour accéder à l'application.")
+        mdp = st.text_input("Mot de passe", type="password", placeholder="••••••••")
+        if st.button("Se connecter", type="primary", use_container_width=True):
+            if mdp == MOT_DE_PASSE:
+                st.session_state.authentifie = True
+                st.rerun()
+            else:
+                st.error("❌ Mot de passe incorrect.")
+        st.stop()
+
+verifier_mdp()
+
+# ── Fonctions ──────────────────────────────────────────────────────────────
 MOIS_FR = {
     'janvier':'01_Janvier','fevrier':'02_Fevrier','février':'02_Fevrier',
     'mars':'03_Mars','avril':'04_Avril','mai':'05_Mai','juin':'06_Juin',
@@ -56,17 +79,25 @@ def trouver_employe(texte, employes, seuil=72):
                 best_score, best_emp = r[1], employes[cles.index(r[0])]
     return (best_emp, best_score, 'fuzzy') if best_emp else (None, 0, '')
 
-# ── Interface Streamlit ────────────────────────────────────────────────────
+# ── Interface ──────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Bulletins de Salaire", page_icon="📄", layout="centered")
 
-st.title("Salut Amir")
-st.markdown("Uploade les fichiers et le tour est joué.")
+col_titre, col_logout = st.columns([5, 1])
+with col_titre:
+    st.title("📄 Séparation Bulletins de Salaire")
+with col_logout:
+    st.markdown("<div style='margin-top:20px'>", unsafe_allow_html=True)
+    if st.button("🚪 Déconnexion"):
+        st.session_state.authentifie = False
+        st.rerun()
+
+st.markdown("Uploadez vos fichiers, ajustez les colonnes si besoin, puis cliquez sur **Lancer**.")
 st.divider()
 
 # ── Upload fichiers ────────────────────────────────────────────────────────
 col1, col2 = st.columns(2)
 with col1:
-    fichier_pdf   = st.file_uploader("📕 Fichier PDF (Payroll)", type=["pdf"])
+    fichier_pdf   = st.file_uploader("📕 Fichier PDF (bulletins)", type=["pdf"])
 with col2:
     fichier_excel = st.file_uploader("📗 Fichier Excel (employés)", type=["xlsx", "xls"])
 
@@ -75,10 +106,10 @@ st.divider()
 # ── Colonnes Excel ─────────────────────────────────────────────────────────
 st.markdown("**Colonnes de votre Excel**")
 c1, c2, c3, c4 = st.columns(4)
-with c1: col_id      = st.number_input("Colonne ID",          min_value=1, max_value=20, value=1)
-with c2: col_nom     = st.number_input("Colonne Nom",         min_value=1, max_value=20, value=2)
-with c3: col_prenom  = st.number_input("Colonne Prénom",      min_value=1, max_value=20, value=3)
-with c4: ligne_debut = st.number_input("1ère ligne données",  min_value=1, max_value=20, value=2)
+with c1: col_id      = st.number_input("Colonne ID",         min_value=1, max_value=20, value=1)
+with c2: col_nom     = st.number_input("Colonne Nom",        min_value=1, max_value=20, value=2)
+with c3: col_prenom  = st.number_input("Colonne Prénom",     min_value=1, max_value=20, value=3)
+with c4: ligne_debut = st.number_input("1ère ligne données", min_value=1, max_value=20, value=2)
 
 st.divider()
 
@@ -93,8 +124,8 @@ if st.button("▶  Lancer le traitement", type="primary", use_container_width=Tr
                                             int(col_prenom), int(ligne_debut))
                 st.info(f"✅ {len(employes)} employés chargés depuis l'Excel")
 
-                reader    = PdfReader(fichier_pdf)
-                nb_pages  = len(reader.pages)
+                reader   = PdfReader(fichier_pdf)
+                nb_pages = len(reader.pages)
                 st.info(f"📄 {nb_pages} pages dans le PDF")
 
                 with pdfplumber.open(fichier_pdf) as pdf_tmp:
@@ -103,9 +134,7 @@ if st.button("▶  Lancer le traitement", type="primary", use_container_width=Tr
                 st.info(f"📅 Période détectée : {mois} {annee}")
 
                 zip_buffer = io.BytesIO()
-                succes, echecs = [], []
-                log_lines = []
-
+                succes, echecs, log_lines = [], [], []
                 progress = st.progress(0, text="Traitement des pages...")
 
                 with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
@@ -134,23 +163,21 @@ if st.button("▶  Lancer le traitement", type="primary", use_container_width=Tr
                                 echecs.append(num)
 
                 progress.empty()
-
-                # ── Résumé ─────────────────────────────────────────────────
                 st.divider()
+
                 col_ok, col_err = st.columns(2)
                 col_ok.metric("Pages traitées ✅", len(succes))
                 col_err.metric("Pages inconnues ⚠️", len(echecs))
 
                 if echecs:
-                    st.warning(f"Pages non reconnues : {echecs}\n\nVérifiez le texte extrait dans le journal ci-dessous.")
+                    st.warning(f"Pages non reconnues : {echecs}\n\nVérifiez le journal ci-dessous.")
 
                 with st.expander("📋 Journal détaillé", expanded=bool(echecs)):
                     st.code('\n'.join(log_lines))
 
-                # ── Téléchargement ─────────────────────────────────────────
                 zip_buffer.seek(0)
                 nom_zip = f'Bulletins_{mois}_{annee}.zip'
-                st.success(f"✅ Traitement terminé ! Cliquez ci-dessous pour télécharger.")
+                st.success("✅ Traitement terminé ! Cliquez ci-dessous pour télécharger.")
                 st.download_button(
                     label=f"📥 Télécharger {nom_zip}",
                     data=zip_buffer.getvalue(),
