@@ -1,0 +1,5 @@
+pypdf
+pdfplumber
+openpyxl
+rapidfuzz
+streamlit
