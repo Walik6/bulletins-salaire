@@ -18,7 +18,20 @@ def verifier_mdp():
         with st.container():
             st.markdown("### 🔒 Accès sécurisé")
             st.markdown("Entrez le mot de passe pour continuer.")
-            mdp = st.text_input("Mot de passe", type="password", placeholder="Mot de passe")
+            st.markdown("""
+                <style>
+                /* Cache le texte 'Press Enter to apply' */
+                div[data-testid="InputInstructions"] { display: none !important; }
+                /* Repositionne l'icône show/hide password */
+                div[data-testid="stTextInput"] button {
+                    top: 0px !important;
+                    right: 0px !important;
+                }
+                </style>
+            """, unsafe_allow_html=True)
+            mdp = st.text_input("Mot de passe", type="password",
+                                placeholder="Mot de passe",
+                                label_visibility="collapsed")
             if st.button("Se connecter", type="primary", use_container_width=True):
                 if mdp == MOT_DE_PASSE:
                     st.session_state.authentifie = True
