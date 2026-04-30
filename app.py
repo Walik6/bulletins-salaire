@@ -59,14 +59,14 @@ def trouver_employe(texte, employes, seuil=72):
 # ── Interface Streamlit ────────────────────────────────────────────────────
 st.set_page_config(page_title="Bulletins de Salaire", page_icon="📄", layout="centered")
 
-st.title("📄 Séparation Bulletins de Salaire")
-st.markdown("Uploadez vos fichiers, ajustez les colonnes si besoin, puis cliquez sur **Lancer**.")
+st.title("Salut Amir")
+st.markdown("Uploade les fichiers et le tour est joué.")
 st.divider()
 
 # ── Upload fichiers ────────────────────────────────────────────────────────
 col1, col2 = st.columns(2)
 with col1:
-    fichier_pdf   = st.file_uploader("📕 Fichier PDF (bulletins)", type=["pdf"])
+    fichier_pdf   = st.file_uploader("📕 Fichier PDF (Payroll)", type=["pdf"])
 with col2:
     fichier_excel = st.file_uploader("📗 Fichier Excel (employés)", type=["xlsx", "xls"])
 
