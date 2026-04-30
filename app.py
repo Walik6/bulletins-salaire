@@ -14,34 +14,17 @@ def verifier_mdp():
 
     if not st.session_state.authentifie:
         st.set_page_config(page_title="Connexion", page_icon="🔒", layout="centered")
-
-        st.markdown("""
-            <style>
-            div[data-testid="stTextInput"] input { margin-bottom: 0 !important; }
-            div[data-testid="stTextInput"] > label { margin-bottom: 4px !important; }
-            .login-box {
-                max-width: 380px;
-                margin: 80px auto 0 auto;
-                padding: 2rem 2rem 1.5rem;
-                border: 1px solid #e0e0e0;
-                border-radius: 12px;
-                background: white;
-            }
-            </style>
-        """, unsafe_allow_html=True)
-
-        st.markdown('<div class="login-box">', unsafe_allow_html=True)
-        st.markdown("### 🔒 Accès sécurisé")
-        st.markdown("Entrez le mot de passe pour continuer.")
-        mdp = st.text_input("Mot de passe", type="password", label_visibility="collapsed",
-                            placeholder="Mot de passe")
-        if st.button("Se connecter", type="primary", use_container_width=True):
-            if mdp == MOT_DE_PASSE:
-                st.session_state.authentifie = True
-                st.rerun()
-            else:
-                st.error("❌ Mot de passe incorrect.")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        with st.container():
+            st.markdown("### 🔒 Accès sécurisé")
+            st.markdown("Entrez le mot de passe pour continuer.")
+            mdp = st.text_input("Mot de passe", type="password", placeholder="Mot de passe")
+            if st.button("Se connecter", type="primary", use_container_width=True):
+                if mdp == MOT_DE_PASSE:
+                    st.session_state.authentifie = True
+                    st.rerun()
+                else:
+                    st.error("❌ Mot de passe incorrect.")
         st.stop()
 
 verifier_mdp()
@@ -101,59 +84,13 @@ def trouver_employe(texte, employes, seuil=72):
 # ── Page config ────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Bulletins de Salaire", page_icon="📄", layout="centered")
 
-# ── CSS global ─────────────────────────────────────────────────────────────
-st.markdown("""
-    <style>
-    /* Bouton déconnexion discret en haut à droite */
-    .logout-btn {
-        position: fixed;
-        top: 14px;
-        right: 16px;
-        z-index: 9999;
-        background: transparent;
-        border: 1px solid #ccc;
-        border-radius: 20px;
-        padding: 4px 14px;
-        font-size: 13px;
-        color: #555;
-        cursor: pointer;
-        white-space: nowrap;
-    }
-    .logout-btn:hover { background: #f5f5f5; border-color: #999; color: #222; }
-    </style>
-""", unsafe_allow_html=True)
-
-# ── Bouton déconnexion ─────────────────────────────────────────────────────
-if st.button("⎋  Déconnexion", key="logout"):
-    st.session_state.authentifie = False
-    st.rerun()
-
-st.markdown("""
-    <style>
-    /* Rend le bouton déconnexion pill et positionné en haut à droite */
-    div[data-testid="stButton"]:has(button[kind="secondary"]:first-child) {
-        position: fixed;
-        top: 12px;
-        right: 16px;
-        z-index: 9999;
-    }
-    div[data-testid="stButton"]:has(button[kind="secondary"]:first-child) button {
-        border-radius: 20px !important;
-        padding: 4px 16px !important;
-        font-size: 13px !important;
-        height: auto !important;
-        min-height: 0 !important;
-        white-space: nowrap !important;
-        border: 1px solid #ccc !important;
-        background: transparent !important;
-        color: #555 !important;
-    }
-    div[data-testid="stButton"]:has(button[kind="secondary"]:first-child) button:hover {
-        background: #f5f5f5 !important;
-        color: #222 !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# ── Sidebar : déconnexion ──────────────────────────────────────────────────
+with st.sidebar:
+    st.markdown("### 📄 Bulletins de Salaire")
+    st.markdown("---")
+    if st.button("🚪 Se déconnecter", use_container_width=True):
+        st.session_state.authentifie = False
+        st.rerun()
 
 # ── Titre ──────────────────────────────────────────────────────────────────
 st.title("📄 Séparation Bulletins de Salaire")
