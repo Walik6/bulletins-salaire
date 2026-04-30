@@ -84,16 +84,17 @@ def trouver_employe(texte, employes, seuil=72):
 # ── Page config ────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Bulletins de Salaire", page_icon="📄", layout="centered")
 
-# ── Sidebar : déconnexion ──────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown("### 📄 Bulletins de Salaire")
-    st.markdown("---")
-    if st.button("🚪 Se déconnecter", use_container_width=True):
+# ── Titre + bouton déconnexion ─────────────────────────────────────────────
+col_titre, _, col_logout = st.columns([6, 1, 2])
+with col_titre:
+    st.title("📄 Bulletins de Salaire")
+with col_logout:
+    st.markdown("<div style='margin-top:18px'>", unsafe_allow_html=True)
+    if st.button("🚪 Déconnexion", use_container_width=True):
         st.session_state.authentifie = False
         st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# ── Titre ──────────────────────────────────────────────────────────────────
-st.title("📄 Séparation Bulletins de Salaire")
 st.markdown("Uploadez vos fichiers, ajustez les colonnes si besoin, puis cliquez sur **Lancer**.")
 st.divider()
 
